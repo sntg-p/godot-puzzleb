@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://dsnevvik6mnus"]
+
+[ext_resource type="ArrayMesh" uid="uid://c4wcajqpoldej" path="res://assets/meshes/circle.obj" id="1_wkdte"]
+[ext_resource type="Texture2D" uid="uid://dlmody17cwodx" path="res://assets/gradients/radial_red.tres" id="2_rsp50"]
+
+[node name="Bubble" type="MeshInstance2D"]
+scale = Vector2(45, 45)
+mesh = ExtResource("1_wkdte")
+texture = ExtResource("2_rsp50")

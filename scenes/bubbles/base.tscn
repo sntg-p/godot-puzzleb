@@ -1,0 +1,49 @@
+[gd_scene load_steps=5 format=3 uid="uid://dau535t0sny68"]
+
+[ext_resource type="ArrayMesh" uid="uid://8ep000dpfql3" path="res://assets/meshes/circle_big.obj" id="1_6eb4b"]
+[ext_resource type="Texture2D" uid="uid://dlmody17cwodx" path="res://assets/gradients/radial_red.tres" id="2_j0clm"]
+[ext_resource type="Script" path="res://scenes/bubbles/base.gd" id="3_jv1tq"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_k4mp2"]
+size = Vector2(45, 30)
+
+[node name="Bubble" type="MeshInstance2D"]
+mesh = ExtResource("1_6eb4b")
+texture = ExtResource("2_j0clm")
+script = ExtResource("3_jv1tq")
+
+[node name="TopLeftArea" type="Area2D" parent="."]
+position = Vector2(-22.5, -30)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TopLeftArea"]
+shape = SubResource("RectangleShape2D_k4mp2")
+
+[node name="TopRightArea" type="Area2D" parent="."]
+position = Vector2(22.5, -30)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TopRightArea"]
+shape = SubResource("RectangleShape2D_k4mp2")
+
+[node name="MiddleLeftArea" type="Area2D" parent="."]
+position = Vector2(-22.5, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MiddleLeftArea"]
+shape = SubResource("RectangleShape2D_k4mp2")
+
+[node name="MiddleRightArea" type="Area2D" parent="."]
+position = Vector2(22.5, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MiddleRightArea"]
+shape = SubResource("RectangleShape2D_k4mp2")
+
+[node name="BottomLeftArea" type="Area2D" parent="."]
+position = Vector2(-22.5, 30)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BottomLeftArea"]
+shape = SubResource("RectangleShape2D_k4mp2")
+
+[node name="BottomRightArea" type="Area2D" parent="."]
+position = Vector2(22.5, 30)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BottomRightArea"]
+shape = SubResource("RectangleShape2D_k4mp2")

@@ -1,0 +1,46 @@
+[gd_scene load_steps=14 format=3 uid="uid://02ratqlwcsxo"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_1jwaj"]
+[ext_resource type="PackedScene" uid="uid://dsnevvik6mnus" path="res://scenes/bubbles/red.tscn" id="2_jkdu2"]
+[ext_resource type="Script" path="res://pointer.gd" id="3_62yy1"]
+[ext_resource type="PackedScene" uid="uid://dsoolle3rxsqd" path="res://scenes/bubbles/yellow.tscn" id="3_rgp82"]
+[ext_resource type="ArrayMesh" uid="uid://c4wcajqpoldej" path="res://assets/meshes/circle.obj" id="4_68x1l"]
+[ext_resource type="PackedScene" uid="uid://cvdb3ydsm1dwi" path="res://scenes/bubbles/blue.tscn" id="4_jap2a"]
+[ext_resource type="PackedScene" uid="uid://b4bwkx31xmrcm" path="res://scenes/projectile.tscn" id="4_um3db"]
+[ext_resource type="PackedScene" uid="uid://dkwvokp6o8we5" path="res://scenes/bubbles/green.tscn" id="5_bktwf"]
+[ext_resource type="PackedScene" uid="uid://05xg3i4on4bk" path="res://scenes/bubbles/gray.tscn" id="6_eyc20"]
+[ext_resource type="PackedScene" uid="uid://guwmxbglqbes" path="res://scenes/bubbles/purple.tscn" id="7_rbq0a"]
+[ext_resource type="PackedScene" uid="uid://dau535t0sny68" path="res://scenes/bubbles/base.tscn" id="11_fk3b4"]
+
+[sub_resource type="Gradient" id="Gradient_ywhba"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0.391521, 0.855362)
+colors = PackedColorArray(0.2, 0.2, 0.2, 0, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_3v552"]
+gradient = SubResource("Gradient_ywhba")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+
+[node name="Root" type="Node2D"]
+script = ExtResource("1_1jwaj")
+bubble_scenes = Array[PackedScene]([ExtResource("2_jkdu2"), ExtResource("3_rgp82"), ExtResource("4_jap2a"), ExtResource("5_bktwf"), ExtResource("6_eyc20"), ExtResource("7_rbq0a")])
+
+[node name="Pointer" type="Node2D" parent="."]
+script = ExtResource("3_62yy1")
+projectile_scene = ExtResource("4_um3db")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Pointer"]
+position = Vector2(360, 1120)
+scale = Vector2(45, 45)
+mesh = ExtResource("4_68x1l")
+texture = SubResource("GradientTexture2D_3v552")
+
+[node name="MeshInstance2D2" type="MeshInstance2D" parent="Pointer"]
+position = Vector2(360, 1120)
+scale = Vector2(45, 45)
+mesh = ExtResource("4_68x1l")
+texture = SubResource("GradientTexture2D_3v552")
+
+[node name="Bubble" parent="." instance=ExtResource("11_fk3b4")]
+position = Vector2(258, 630)
