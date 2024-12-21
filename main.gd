@@ -7,6 +7,12 @@ class_name Main extends Node2D
 var bubbles = {}
 var bubbleGroups: Array[BubbleGroup] = []
 
+func has_bubble(row: int, indexInRow: int) -> bool:
+	if !bubbles.has(row):
+		bubbles[row] = {}
+	
+	return bubbles[row].has(indexInRow)
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if not enable_bubble_generation:
@@ -21,6 +27,7 @@ func _ready() -> void:
 		var isOdd = row % 2
 		var rowOffset = Bubble.radius * isOdd
 		#var rowOffset = 0
+		bubbles[row] = {}
 
 		for indexInRow in range(8 - isOdd):
 			var bubbleIndex = row * 8 + indexInRow;
@@ -34,31 +41,24 @@ func _ready() -> void:
 			bubble.type = bubbleType
 			bubble.row = row
 			bubble.indexInRow = indexInRow
-			bubble.name = "Bubble_%s_%s" % [row, indexInRow]
-			bubbles[bubbleIndex] = bubble
+			bubbles[row][indexInRow] = bubble
 
-			if (indexInRow > 0):
-				var leftBubbleIndex = bubbleIndex - 1
-				var leftBubbleType = levelData[leftBubbleIndex]
-				if (leftBubbleType == bubbleType):
-					var matchingBubble: Bubble = bubbles[leftBubbleIndex]
-					matchingBubble.add_sibling(bubble)
+			if indexInRow > 0:
+				var leftBubble = bubbles[row][indexInRow - 1]
+				if leftBubble.type == bubbleType:
+					leftBubble.add_sibling(bubble)
 					continue
 
 			if row != 0:
-				var upLeftBubbleIndex = bubbleIndex - (8 - isOdd)
-				var upLeftBubbleType = levelData[upLeftBubbleIndex]
-				if upLeftBubbleType == bubbleType:
-					var matchingBubble: Bubble = bubbles[upLeftBubbleIndex]
-					matchingBubble.add_sibling(bubble)
+				var upLeftBubble = bubbles[row - 1][indexInRow]
+				if upLeftBubble.type == bubbleType:
+					upLeftBubble.add_sibling(bubble)
 					continue
 
 				if isOdd:
-					var upRightBubbleIndex = upLeftBubbleIndex + 1
-					var upRightBubbleType = levelData[upRightBubbleIndex]
-					if upRightBubbleType == bubbleType:
-						var matchingBubble: Bubble = bubbles[upRightBubbleType]
-						matchingBubble.add_sibling(bubble)
+					var upRightBubble = bubbles[row - 1][indexInRow + 1]
+					if upRightBubble.type == bubbleType:
+						upRightBubble.add_sibling(bubble)
 						continue
 
 			var group = BubbleGroup.new()
