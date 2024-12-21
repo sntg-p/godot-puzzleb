@@ -1,17 +1,19 @@
-class_name ProjectileBubble extends Area2D
+class_name ProjectileBubble extends StaticBody2D
 
 @export var linear_velocity = Vector2.ZERO
 
 var radius = 45
 var right = 0
 var bottom = 0
+var type = -1
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	var viewport_rect_size = get_viewport_rect().size
 	right = viewport_rect_size.x
 	bottom = viewport_rect_size.y
-
+	#type = randi() % 6
+	type = 0
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:

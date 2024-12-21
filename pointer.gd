@@ -7,12 +7,6 @@ func _ready() -> void:
 	$MeshInstance2D.process_mode = Node.PROCESS_MODE_DISABLED
 	$MeshInstance2D.hide()
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-
-
 var isPointing = false
 
 func _input(event: InputEvent) -> void:

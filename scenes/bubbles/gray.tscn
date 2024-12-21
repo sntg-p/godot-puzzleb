@@ -1,9 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://05xg3i4on4bk"]
 
-[ext_resource type="ArrayMesh" uid="uid://c4wcajqpoldej" path="res://assets/meshes/circle.obj" id="1_yfoma"]
+[ext_resource type="PackedScene" uid="uid://dau535t0sny68" path="res://scenes/bubbles/base.tscn" id="1_xgdsc"]
 [ext_resource type="Texture2D" uid="uid://khxgi40sj8oq" path="res://assets/gradients/radial_gray.tres" id="2_o8pc1"]
 
-[node name="Bubble" type="MeshInstance2D"]
-scale = Vector2(45, 45)
-mesh = ExtResource("1_yfoma")
+[node name="Bubble" instance=ExtResource("1_xgdsc")]
 texture = ExtResource("2_o8pc1")
