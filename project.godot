@@ -21,6 +21,11 @@ window/size/viewport_width=720
 window/size/viewport_height=1280
 window/stretch/mode="canvas_items"
 
+[layer_names]
+
+2d_physics/layer_1="Bubbles"
+2d_physics/layer_2="Projectile"
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"

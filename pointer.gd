@@ -13,7 +13,6 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		match event.button_index:
 			MOUSE_BUTTON_LEFT:
-				print(event.position)
 				isPointing = event.pressed
 				if (isPointing):
 					$MeshInstance2D.process_mode = Node.PROCESS_MODE_INHERIT
@@ -25,7 +24,6 @@ func _input(event: InputEvent) -> void:
 					var projectile: ProjectileBubble = projectile_scene.instantiate()
 					projectile.position = Vector2(720 / 2, 1120)
 					var angle = event.position.angle_to_point(projectile.position)
-					print(angle)
 					projectile.linear_velocity = Vector2(-1000, 0).rotated(angle)
 					get_parent().add_child(projectile)
 

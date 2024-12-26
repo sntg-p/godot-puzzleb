@@ -3,52 +3,30 @@
 [ext_resource type="ArrayMesh" uid="uid://8ep000dpfql3" path="res://assets/meshes/circle_big.obj" id="1_6eb4b"]
 [ext_resource type="Script" path="res://scenes/bubbles/bubble.gd" id="3_jv1tq"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_k4mp2"]
-size = Vector2(45, 30)
+[sub_resource type="CircleShape2D" id="CircleShape2D_5uhun"]
+radius = 45.0
 
 [node name="Bubble" type="MeshInstance2D"]
 mesh = ExtResource("1_6eb4b")
 script = ExtResource("3_jv1tq")
 
-[node name="TopLeft" type="Area2D" parent="."]
-position = Vector2(-22.5, -30)
+[node name="CollapseTrigger" type="Area2D" parent="."]
+collision_mask = 0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="TopLeft"]
-shape = SubResource("RectangleShape2D_k4mp2")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CollapseTrigger"]
+shape = SubResource("CircleShape2D_5uhun")
 
-[node name="TopRight" type="Area2D" parent="."]
-position = Vector2(22.5, -30)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="TopRight"]
-shape = SubResource("RectangleShape2D_k4mp2")
-
-[node name="MiddleLeft" type="Area2D" parent="."]
-position = Vector2(-22.5, 0)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MiddleLeft"]
-shape = SubResource("RectangleShape2D_k4mp2")
-
-[node name="MiddleRight" type="Area2D" parent="."]
-position = Vector2(22.5, 0)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MiddleRight"]
-shape = SubResource("RectangleShape2D_k4mp2")
-
-[node name="BottomLeft" type="Area2D" parent="."]
-position = Vector2(-22.5, 30)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="BottomLeft"]
-shape = SubResource("RectangleShape2D_k4mp2")
-
-[node name="BottomRight" type="Area2D" parent="."]
-position = Vector2(22.5, 30)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="BottomRight"]
-shape = SubResource("RectangleShape2D_k4mp2")
-
-[connection signal="body_entered" from="TopLeft" to="." method="_on_top_left_body_entered"]
-[connection signal="body_entered" from="TopRight" to="." method="_on_top_right_body_entered"]
-[connection signal="body_entered" from="MiddleLeft" to="." method="_on_middle_left_body_entered"]
-[connection signal="body_entered" from="MiddleRight" to="." method="_on_middle_right_body_entered"]
-[connection signal="body_entered" from="BottomLeft" to="." method="_on_bottom_left_body_entered"]
-[connection signal="body_entered" from="BottomRight" to="." method="_on_bottom_right_body_entered"]
+[node name="Label" type="Label" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -45.0
+offset_top = -11.0
+offset_right = 45.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_alignment = 1
+autowrap_mode = 2

@@ -22,6 +22,9 @@ var isEven:
 		return 1 if row % 2 == 0 else 0 
 
 
+var group: BubbleGroup
+
+
 static func calculate_position(row: int, indexInRow: int):
 	var isOdd = row % 2
 	var rowOffset = Bubble.radius * isOdd
@@ -34,74 +37,20 @@ static func calculate_position(row: int, indexInRow: int):
 func _ready() -> void:
 	name = "Bubble_%s_%s" % [row, indexInRow]
 	position = calculate_position(row, indexInRow)
-	var group: BubbleGroup = get_parent()
+	group = get_parent()
 	group.type = type
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
+	$Label.text = "%s-%s\nt: %s; g: %s" % [row, indexInRow, self.type, group.name.get_slice('_', 1)]
 	pass
 
 
 func type_matches(projectile: ProjectileBubble):
-	var value = projectile.type == self.type
-	if value:
-		print('type matches')
-
-	return value
+	return projectile.type == self.type
 
 
-func _on_top_left_body_entered(body: ProjectileBubble) -> void:
-	print('_on_top_left_body_entered')
-
-	if type_matches(body):
-		_spawn_from_projectile(row - 1, indexInRow, body)
-
-
-func _on_top_right_body_entered(body: Node2D) -> void:
-	print('_on_top_right_body_entered')
-
-	if type_matches(body):
-		_spawn_from_projectile(row - 1, indexInRow + 1, body)
-
-
-func _on_middle_left_body_entered(body: Node2D) -> void:
-	print('_on_middle_left_body_entered')
-
-	if type_matches(body):
-		_spawn_from_projectile(row, indexInRow - 1, body)
-
-
-func _on_middle_right_body_entered(body: Node2D) -> void:
-	print('_on_middle_right_body_entered')
-
-	if type_matches(body):
-		_spawn_from_projectile(row, indexInRow + 1, body)
-
-
-func _on_bottom_left_body_entered(body: Node2D) -> void:
-	print('_on_bottom_left_body_entered')
-
-	if type_matches(body):
-		_spawn_from_projectile(row + 1, indexInRow - isEven, body)
-
-
-func _on_bottom_right_body_entered(body: Node2D) -> void:
-	print('_on_bottom_right_body_entered')
-
-	if type_matches(body):
-		_spawn_from_projectile(row + 1, indexInRow + isOdd, body)
-
-func _spawn_from_projectile(row: int, indexInRow: int, body: ProjectileBubble):
-	var main: Main = get_node('/root/Main')
-	if main.has_bubble(row, indexInRow):
-		print('bubble exists, skipping')
-		return
-
-	print('spawning bubble')
-	var bubble: Bubble = main.bubble_scenes[body.type].instantiate()
-	bubble.type = type
-	bubble.row = row
-	bubble.indexInRow = indexInRow
-	add_sibling(bubble)
-	body.queue_free()
+func add_sibling_bubble(sibling: Bubble, check_count: bool = false):
+	var group: BubbleGroup = get_parent()
+	group.add_bubble(sibling, check_count)
