@@ -3,10 +3,14 @@ class_name ProjectileBubble extends Area2D
 
 @export var linear_velocity = Vector2.ZERO
 
-var radius = 45
 var right = 0
 var bottom = 0
 var type = -1
+
+@export var texture: Texture2D:
+	set(value):
+		$MeshInstance2D.texture = value
+
 
 @onready var main: Main = get_node('/root/Main')
 
@@ -16,76 +20,48 @@ func _ready() -> void:
 	var viewport_rect_size = get_viewport_rect().size
 	right = viewport_rect_size.x
 	bottom = viewport_rect_size.y
-	#type = randi() % 6
-	type = 0
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	var left_wall_collision = position.x - radius <= 0
+	var left_wall_collision = position.x - Bubble.radius <= 0
 	if left_wall_collision:
 		linear_velocity.x *= -1
 	
-	var right_wall_collision = position.x + radius >= right
+	var right_wall_collision = position.x + Bubble.radius >= right
 	if right_wall_collision:
 		linear_velocity.x *= -1
 	
-	var top_wall_collistion = position.y - radius <= 0
-	if top_wall_collistion:
-		linear_velocity.y *= -1
+	var top_wall_collision = position.y - Bubble.radius <= 0
+	if top_wall_collision:
+		_handle_top_wall_collision()
+		return
+		#linear_velocity.y *= -1
 	
-	var bottom_wall_collision = position.y - radius >= bottom
+	var bottom_wall_collision = position.y - Bubble.radius >= bottom
 	if bottom_wall_collision:
 		self.queue_free()
 	
 	position += linear_velocity * delta
-	pass
 
 
 # Returns a group when possible
-func _find_or_create_group(row: int, indexInRow: int) -> BubbleGroup:
-	#var neighborIndexes = []
-	#var neighbors: Array[Bubble] = []
-	var isOdd = row % 2
-	var isEven = 0 if isOdd == 1 else 1
-	var topRow = row - 1
-	var bottom_row = row + 1
+func _find_or_create_group(row: int, index_in_row: int) -> BubbleGroup:
+	var neighbor_indexes = Bubble.get_neighbor_indexes(row, index_in_row)
 	
-	var neighborIndexes = [
-		# top left
-		[topRow, indexInRow - isEven],
-		
-		# top right
-		[topRow, indexInRow + 1 - isEven],
-		
-		# center right
-		[row, indexInRow + 1],
-		
-		# bottom right
-		[bottom_row, indexInRow + 1 - isEven],
-		
-		# bottom left
-		[bottom_row, indexInRow - isEven],
-		
-		# center_left
-		[row, indexInRow - 1]
-	]
-	
-	#print(neighborIndexes)
-	
-	var existing_neighbors = 0
-	var matches_amount = 0
+	var neighbors = 0
+	var matches = 0
 	var matching_groups = Set.new()
 	var last_group: BubbleGroup
 	
 	# find matching groups and bubbles amount
-	for bubblePosition in neighborIndexes:
+	for bubblePosition in neighbor_indexes:
 		var bubble: Bubble = main.get_bubble(
 			bubblePosition[0], bubblePosition[1]
 		)
 
 		if !bubble: continue
-		existing_neighbors += 1
+		neighbors += 1
 		
 		if bubble.type == self.type:
 			print('%s-%s is of same type' % [bubble.row, bubble.indexInRow])
@@ -93,25 +69,22 @@ func _find_or_create_group(row: int, indexInRow: int) -> BubbleGroup:
 			if matching_groups.has(group): continue
 			
 			assert(group != null, 'bubble %s-%s parent is null' % [bubble.row, bubble.indexInRow])
-			matches_amount += group.get_child_count()
+			matches += group.get_child_count()
 			matching_groups.add(group)
 			last_group = group
 	
-	print('%s neighbor(s), %s of same type in contact' % [existing_neighbors, matches_amount])
+	print('%s neighbor(s), %s of same type in contact' % [neighbors, matches])
 
-	if matches_amount >= 2:
+	if matches >= 2:
 		for group: BubbleGroup in matching_groups.values():
-			var children = group.get_children()
-			for child in children:
-				assert(child is Bubble)
-				main.remove_bubble(child)
+			for dependent in group.dependents.values():
+				main.remove_group(dependent)
 			
-			print('freeing group %s' % [group.name])
-			group.queue_free()
+			main.remove_group(group)
 		
 		return null
 	
-	if matches_amount == 0:
+	if matches == 0:
 		assert(!last_group)
 		last_group = main.new_group(self.type)
 	
@@ -128,15 +101,11 @@ func _find_or_create_group(row: int, indexInRow: int) -> BubbleGroup:
 	return last_group
 
 
-func _collapse(row: int, indexInRow: int, collision: Bubble):
-	if main.has_bubble(row, indexInRow):
-		print('bubble exists, skipping')
-		return
-	
+func _collapse(row: int, indexInRow: int):
 	var group = _find_or_create_group(row, indexInRow)
 	if group:
 		print('spawning bubble at %s-%s' % [row, indexInRow])
-		var bubble: Bubble = main.new_bubble(row, indexInRow, self.type)
+		var bubble = main.new_bubble(row, indexInRow, type, position)
 		group.add_bubble(bubble)
 		main.add_child(group)
 	
@@ -188,5 +157,21 @@ func _on_area_entered(area: Area2D) -> void:
 		row, indexInRow, collision.row, collision.indexInRow
 	])
 	
-	_collapse(row, indexInRow, collision)
+	if main.has_bubble(row, indexInRow):
+		print('bubble exists, skipping')
+		return
 	
+	_collapse(row, indexInRow)
+
+
+func _handle_top_wall_collision():
+	var row = 0
+	var index_in_row = (int(position.x) / Bubble.diameter) % 8
+	
+	#print('_handle_top_wall_collision at x = %s, spawning bubble at %s-%s' % [position.x, row, index_in_row])
+	
+	if main.has_bubble(row, index_in_row):
+		print('bubble exists, skipping')
+		return
+	
+	_collapse(row, index_in_row)

@@ -1,7 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://b4bwkx31xmrcm"]
+[gd_scene load_steps=4 format=3 uid="uid://b4bwkx31xmrcm"]
 
-[ext_resource type="ArrayMesh" uid="uid://c4wcajqpoldej" path="res://assets/meshes/circle.obj" id="1_2uq78"]
-[ext_resource type="Texture2D" uid="uid://dlmody17cwodx" path="res://assets/gradients/radial_red.tres" id="2_ue24q"]
+[ext_resource type="ArrayMesh" uid="uid://8ep000dpfql3" path="res://assets/meshes/circle_big.obj" id="2_g4wwl"]
 [ext_resource type="Script" path="res://projectile.gd" id="3_pjqnq"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_qjj0w"]
@@ -12,9 +11,7 @@ collision_layer = 2
 script = ExtResource("3_pjqnq")
 
 [node name="MeshInstance2D" type="MeshInstance2D" parent="."]
-scale = Vector2(45, 45)
-mesh = ExtResource("1_2uq78")
-texture = ExtResource("2_ue24q")
+mesh = ExtResource("2_g4wwl")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_qjj0w")

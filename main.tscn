@@ -1,15 +1,21 @@
-[gd_scene load_steps=13 format=3 uid="uid://02ratqlwcsxo"]
+[gd_scene load_steps=19 format=3 uid="uid://02ratqlwcsxo"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_1jwaj"]
 [ext_resource type="PackedScene" uid="uid://dsnevvik6mnus" path="res://scenes/bubbles/red.tscn" id="2_jkdu2"]
 [ext_resource type="Script" path="res://pointer.gd" id="3_62yy1"]
 [ext_resource type="PackedScene" uid="uid://dsoolle3rxsqd" path="res://scenes/bubbles/yellow.tscn" id="3_rgp82"]
-[ext_resource type="ArrayMesh" uid="uid://c4wcajqpoldej" path="res://assets/meshes/circle.obj" id="4_68x1l"]
 [ext_resource type="PackedScene" uid="uid://cvdb3ydsm1dwi" path="res://scenes/bubbles/blue.tscn" id="4_jap2a"]
 [ext_resource type="PackedScene" uid="uid://b4bwkx31xmrcm" path="res://scenes/projectile.tscn" id="4_um3db"]
 [ext_resource type="PackedScene" uid="uid://dkwvokp6o8we5" path="res://scenes/bubbles/green.tscn" id="5_bktwf"]
 [ext_resource type="PackedScene" uid="uid://05xg3i4on4bk" path="res://scenes/bubbles/gray.tscn" id="6_eyc20"]
 [ext_resource type="PackedScene" uid="uid://guwmxbglqbes" path="res://scenes/bubbles/purple.tscn" id="7_rbq0a"]
+[ext_resource type="Texture2D" uid="uid://dlmody17cwodx" path="res://assets/gradients/radial_red.tres" id="10_s7gj2"]
+[ext_resource type="Texture2D" uid="uid://c2ijtotcrs4kj" path="res://assets/gradients/radial_yellow.tres" id="11_e3i1q"]
+[ext_resource type="Texture2D" uid="uid://dtrixk1qq1y5t" path="res://assets/gradients/radial_blue.tres" id="12_038wq"]
+[ext_resource type="Texture2D" uid="uid://dj1s733jp75go" path="res://assets/gradients/radial_green.tres" id="13_77ot6"]
+[ext_resource type="Texture2D" uid="uid://khxgi40sj8oq" path="res://assets/gradients/radial_gray.tres" id="14_xtvel"]
+[ext_resource type="Texture2D" uid="uid://blmg2rekmp3ty" path="res://assets/gradients/radial_purple.tres" id="15_my4oh"]
+[ext_resource type="ArrayMesh" uid="uid://8ep000dpfql3" path="res://assets/meshes/circle_big.obj" id="16_gita3"]
 
 [sub_resource type="Gradient" id="Gradient_ywhba"]
 interpolation_mode = 2
@@ -23,20 +29,22 @@ fill_from = Vector2(0.5, 0.5)
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_1jwaj")
+enable_bubble_generation = false
 bubble_scenes = Array[PackedScene]([ExtResource("2_jkdu2"), ExtResource("3_rgp82"), ExtResource("4_jap2a"), ExtResource("5_bktwf"), ExtResource("6_eyc20"), ExtResource("7_rbq0a")])
 
 [node name="Pointer" type="Node2D" parent="."]
 script = ExtResource("3_62yy1")
 projectile_scene = ExtResource("4_um3db")
+bubble_types = Array[Resource]([ExtResource("10_s7gj2"), ExtResource("11_e3i1q"), ExtResource("12_038wq"), ExtResource("13_77ot6"), ExtResource("14_xtvel"), ExtResource("15_my4oh")])
 
-[node name="MeshInstance2D" type="MeshInstance2D" parent="Pointer"]
+[node name="MouseIndicator" type="MeshInstance2D" parent="Pointer"]
 position = Vector2(360, 1120)
-scale = Vector2(45, 45)
-mesh = ExtResource("4_68x1l")
+mesh = ExtResource("16_gita3")
 texture = SubResource("GradientTexture2D_3v552")
 
-[node name="MeshInstance2D2" type="MeshInstance2D" parent="Pointer"]
+[node name="NextBubble" type="MeshInstance2D" parent="Pointer"]
 position = Vector2(360, 1120)
-scale = Vector2(45, 45)
-mesh = ExtResource("4_68x1l")
+mesh = ExtResource("16_gita3")
 texture = SubResource("GradientTexture2D_3v552")
+
+[connection signal="level_loaded" from="." to="Pointer" method="_on_main_level_loaded"]

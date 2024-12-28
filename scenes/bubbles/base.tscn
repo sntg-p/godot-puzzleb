@@ -4,7 +4,7 @@
 [ext_resource type="Script" path="res://scenes/bubbles/bubble.gd" id="3_jv1tq"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_5uhun"]
-radius = 45.0
+radius = 40.0
 
 [node name="Bubble" type="MeshInstance2D"]
 mesh = ExtResource("1_6eb4b")

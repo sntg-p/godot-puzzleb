@@ -2,17 +2,27 @@ class_name BubbleGroup extends Node
 
 var type = -1
 
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.
+
+var is_touching_wall: bool:
+	get:
+		var children = get_children()
+		for child: Bubble in children:
+			if child.is_touching_wall: return true
+		
+		return false
+
+var _dependents = Set.new()
+var dependents: Set:
+	get: return _dependents
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+func add_dependent(group: BubbleGroup) -> void:
+	_dependents.add(group)
+
 
 func _init(type: int):
 	self.type = type
+
 
 func add_bubble(bubble: Bubble, check_count: bool = false) -> void:
 	if check_count and get_child_count() >= 2:
@@ -21,8 +31,9 @@ func add_bubble(bubble: Bubble, check_count: bool = false) -> void:
 		for it in get_children():
 			var bubbleRow: Dictionary = main.bubbles[it.row]
 			bubbleRow.erase(it.indexInRow)
-
+		
 		queue_free()
 		return
-
+	
+	
 	add_child(bubble)
