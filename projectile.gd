@@ -45,70 +45,12 @@ func _process(delta: float) -> void:
 	position += linear_velocity * delta
 
 
-# Returns a group when possible
-func _find_or_create_group(row: int, index_in_row: int) -> BubbleGroup:
-	var neighbor_indexes = Bubble.get_neighbor_indexes(row, index_in_row)
+func _to_bubble(row: int, indexInRow: int):
+	if main.has_bubble(row, indexInRow):
+		print('bubble exists, skipping')
+		return
 	
-	var neighbors = 0
-	var matches = 0
-	var matching_groups = Set.new()
-	var last_group: BubbleGroup
-	
-	# find matching groups and bubbles amount
-	for bubblePosition in neighbor_indexes:
-		var bubble: Bubble = main.get_bubble(
-			bubblePosition[0], bubblePosition[1]
-		)
-
-		if !bubble: continue
-		neighbors += 1
-		
-		if bubble.type == self.type:
-			print('%s-%s is of same type' % [bubble.row, bubble.indexInRow])
-			var group = bubble.get_parent()
-			if matching_groups.has(group): continue
-			
-			assert(group != null, 'bubble %s-%s parent is null' % [bubble.row, bubble.indexInRow])
-			matches += group.get_child_count()
-			matching_groups.add(group)
-			last_group = group
-	
-	print('%s neighbor(s), %s of same type in contact' % [neighbors, matches])
-
-	if matches >= 2:
-		for group: BubbleGroup in matching_groups.values():
-			for dependent in group.dependents.values():
-				main.remove_group(dependent)
-			
-			main.remove_group(group)
-		
-		return null
-	
-	if matches == 0:
-		assert(!last_group)
-		last_group = main.new_group(self.type)
-	
-	for group: BubbleGroup in matching_groups.values():
-		if group == last_group: continue
-		
-		var children = group.get_children()
-		for child in children:
-			assert(child is Bubble)
-			last_group.add_bubble(child)
-		
-		group.queue_free()
-	
-	return last_group
-
-
-func _collapse(row: int, indexInRow: int):
-	var group = _find_or_create_group(row, indexInRow)
-	if group:
-		print('spawning bubble at %s-%s' % [row, indexInRow])
-		var bubble = main.new_bubble(row, indexInRow, type, position)
-		group.add_bubble(bubble)
-		main.add_child(group)
-	
+	main.spawn_bubble(row, indexInRow, type, position)
 	self.queue_free()
 
 
@@ -157,11 +99,8 @@ func _on_area_entered(area: Area2D) -> void:
 		row, indexInRow, collision.row, collision.indexInRow
 	])
 	
-	if main.has_bubble(row, indexInRow):
-		print('bubble exists, skipping')
-		return
-	
-	_collapse(row, indexInRow)
+	#_to_bubble.call_deferred(row, indexInRow)
+	_to_bubble(row, indexInRow)
 
 
 func _handle_top_wall_collision():
@@ -170,8 +109,4 @@ func _handle_top_wall_collision():
 	
 	#print('_handle_top_wall_collision at x = %s, spawning bubble at %s-%s' % [position.x, row, index_in_row])
 	
-	if main.has_bubble(row, index_in_row):
-		print('bubble exists, skipping')
-		return
-	
-	_collapse(row, index_in_row)
+	_to_bubble(row, index_in_row)

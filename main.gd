@@ -7,7 +7,8 @@ signal level_loaded()
 
 
 var bubbles = {}
-var bubbleGroups: Array[BubbleGroup] = []
+#var bubbleGroups: Array[BubbleGroup] = []
+#var bubble_groups: int = 0
 
 var _current_types = {}
 
@@ -27,23 +28,14 @@ func get_bubble(row: int, indexInRow: int) -> Bubble:
 	return bubblesRow.get(indexInRow)
 
 
-func new_group(type: int) -> BubbleGroup:
-	var group = BubbleGroup.new(type)
-	group.name = "BubbleGroup_%s" % [bubbleGroups.size()]
-	bubbleGroups.push_back(group)
-	return group
-
-
 func new_bubble(row: int, indexInRow: int, type: int, origin: Vector2 = Vector2.ZERO) -> Bubble:
 	var bubble: Bubble = bubble_scenes[type].instantiate()
 	
 	var position = Bubble.calculate_position(row, indexInRow)
 	if origin != Vector2.ZERO:
-		bubble.animate_spawn(origin, position)
+		bubble.animate_spawn(origin, position, get_tree().create_tween())
 	else:
 		bubble.position = position
-	
-	#bubble.position = position
 	
 	bubble.type = type
 	bubble.row = row
@@ -58,10 +50,10 @@ func new_bubble(row: int, indexInRow: int, type: int, origin: Vector2 = Vector2.
 	return bubble
 
 
-func remove_bubble(bubble: Bubble):
+func _remove_bubble(bubble: Bubble):
 	if has_bubble(bubble.row, bubble.indexInRow):
 		var bubblesRow: Dictionary = bubbles[bubble.row]
-		print('removing bubble %s-%s' % [bubble.row, bubble.indexInRow])
+		#print('removing bubble %s-%s' % [bubble.row, bubble.indexInRow])
 		bubblesRow.erase(bubble.indexInRow)
 		assert(
 			_current_types[bubble.type] > 0,
@@ -70,14 +62,39 @@ func remove_bubble(bubble: Bubble):
 		_current_types[bubble.type] -= 1
 
 
+func spawn_bubble(row: int, indexInRow: int, type: int, origin = Vector2.ZERO, defer_group_add = true):
+	var neighbor_indexes = Bubble.get_neighbor_indexes(row, indexInRow)
+	var neighbor_list: Array[Bubble] = []
+	
+	for index in neighbor_indexes:
+		var bubble = get_bubble(index[0], index[1])
+		if bubble: neighbor_list.push_back(bubble)
+	
+	var group = Bubble.find_or_create_group(neighbor_list, type)
+	if group:
+		print('spawning bubble at %s-%s' % [row, indexInRow])
+		#group.enable_count_checking = true
+		var bubble = new_bubble(row, indexInRow, type, origin)
+		if group.get_parent() != self:
+			add_child(group)
+		
+		if defer_group_add:
+			var add_to_group = func ():
+				group.add_child(bubble)
+				group.check_count()
+			
+			add_to_group.call_deferred()
+		else:
+			group.add_child(bubble)
+
+
 func remove_group(group: BubbleGroup):
 	var children = group.get_children()
-	for child in children:
-		assert(child is Bubble)
-		remove_bubble(child)
+	for child: Bubble in children:
+		_remove_bubble(child)
 	
-	print('freeing group %s' % [group.name])
-	group.queue_free()
+	print('destroying group %s' % [group.name])
+	group.destroy()
 
 
 func get_random_bubble_type():
@@ -120,58 +137,11 @@ func _ready() -> void:
 		var isOdd = row % 2
 		bubbles[row] = {}
 		
-		for indexInRow in range(8 - isOdd):
+		for indexInRow in range(8):
 			var bubbleIndex = row * 8 + indexInRow;
 			var bubbleType = levelData[bubbleIndex]
+			if bubbleType == -1: continue
 			
-			if bubbleType == -1:
-				continue
-			
-			var bubble: Bubble = new_bubble(row, indexInRow, bubbleType)
-			var depends_on: BubbleGroup
-			
-			if indexInRow > 0:
-				var leftBubble = get_bubble(row, indexInRow - 1)
-				if leftBubble.type == bubbleType:
-					leftBubble.add_sibling_bubble(bubble)
-					continue
-				
-				if not bubble.is_touching_wall:
-					var leftBubbleGroup: BubbleGroup = leftBubble.get_parent()
-					if leftBubbleGroup.is_touching_wall:
-						depends_on = leftBubbleGroup
-			
-			if row != 0:
-				var upLeftBubble = get_bubble(row - 1, indexInRow)
-				if upLeftBubble.type == bubbleType:
-					upLeftBubble.add_sibling_bubble(bubble)
-					continue
-				
-				var upLeftBubbleGroup: BubbleGroup = upLeftBubble.get_parent()
-				if upLeftBubbleGroup.is_touching_wall:
-					depends_on = upLeftBubbleGroup
-			
-				if isOdd:
-					var upRightBubble = get_bubble(row - 1, indexInRow + 1)
-					if upRightBubble.type == bubbleType:
-						upRightBubble.add_sibling_bubble(bubble)
-						continue
-					
-					var upRightBubbleGroup: BubbleGroup = upRightBubble.get_parent()
-					if upRightBubbleGroup.is_touching_wall:
-						depends_on = upRightBubbleGroup
-			
-			var group = new_group(bubble.type)
-			group.add_bubble(bubble)
-			
-			if depends_on:
-				print('adding %s-%s as dependent of %s' % [
-					row, indexInRow, group.name
-				])
-				
-				depends_on.add_dependent(group)
-	
-	for group in bubbleGroups:
-		add_child(group)
+			spawn_bubble(row, indexInRow, bubbleType, Vector2.ZERO, false)
 	
 	level_loaded.emit()

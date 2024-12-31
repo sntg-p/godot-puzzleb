@@ -56,6 +56,12 @@ static func get_neighbor_indexes(row: int, index_in_row: int) -> Array:
 	]
 
 
+#var _neighbor_indexes: Array
+#var neighbor_indexes: Array:
+	#get:
+		#if not _neighbor_indexes:
+			#
+
 static func calculate_position(row: int, indexInRow: int):
 	var isOdd = row % 2
 	var rowOffset = Bubble.radius * isOdd
@@ -64,43 +70,55 @@ static func calculate_position(row: int, indexInRow: int):
 	return Vector2(x, y)
 
 
+# Returns a group when possible
+static func find_or_create_group(neighbor_list: Array[Bubble], type: int) -> BubbleGroup:
+	var matches = 0
+	var matching_groups = Set.new()
+	var last_group: BubbleGroup
+
+	for bubble in neighbor_list:
+		if bubble.type == type:
+			print('%s-%s is of same type' % [bubble.row, bubble.indexInRow])
+			var group = bubble.get_parent()
+			if matching_groups.has(group): continue
+			
+			assert(group != null, 'bubble %s-%s parent is null' % [bubble.row, bubble.indexInRow])
+			matches += group.get_child_count()
+			matching_groups.add(group)
+			last_group = group
+	
+	print('%s neighbor(s), %s of same type in contact' % [neighbor_list.size(), matches])
+	
+	if not last_group:
+		return BubbleGroup.new(type)
+	
+	for group: BubbleGroup in matching_groups.values():
+		if group == last_group: continue
+		
+		var children = group.get_children()
+		for child in children:
+			assert(child is Bubble)
+			last_group.add_child(child)
+		
+		group.queue_free()
+	
+	return last_group
+
+
 func type_matches(projectile: ProjectileBubble):
 	return projectile.type == self.type
 
 
 func add_sibling_bubble(sibling: Bubble):
 	var group: BubbleGroup = get_parent()
-	group.add_bubble(sibling)
+	group.add_child(sibling)
 
 
-var _origin: Vector2
-var _target: Vector2
-var _animating: bool = false
-var _animation_progress: float = 1
-var _animation_speed = 25
-
-
-func animate_spawn(origin: Vector2, target: Vector2):
-	#print('animating bubble spawn')
-	position = origin
-	_animating = true
-	_animation_progress = 0
-	_origin = origin
-	_target = target
-
-
-func _update_animation(delta: float):
-	if not _animating: return
-	
-	if _animation_progress > 1:
-		_animating = false
-		position = _target
-		return
-	
-	#print('updating bubble spawn animation, progress: %s' % [_animation_progress])
-	var step = delta * _animation_speed
-	_animation_progress += step
-	position = _origin.lerp(_target, _animation_progress)
+func animate_spawn(origin: Vector2, target: Vector2, tween: Tween):
+	print('animating bubble spawn')
+	tween.tween_property(self, "position", target, .15).from(origin)
+	tween.set_trans(Tween.TRANS_EXPO)
+	pass
 
 
 func _ready() -> void:
@@ -112,7 +130,3 @@ func _enter_tree() -> void:
 	$Label.text = "%s-%s\nt: %s; g: %s" % [
 		row, indexInRow, self.type, group.name.get_slice('_', 1)
 	]
-
-
-func _process(delta: float) -> void:
-	_update_animation(delta)
