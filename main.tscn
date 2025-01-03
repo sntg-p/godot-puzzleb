@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://02ratqlwcsxo"]
+[gd_scene load_steps=20 format=3 uid="uid://02ratqlwcsxo"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_1jwaj"]
 [ext_resource type="PackedScene" uid="uid://dsnevvik6mnus" path="res://scenes/bubbles/red.tscn" id="2_jkdu2"]
@@ -16,6 +16,7 @@
 [ext_resource type="Texture2D" uid="uid://khxgi40sj8oq" path="res://assets/gradients/radial_gray.tres" id="14_xtvel"]
 [ext_resource type="Texture2D" uid="uid://blmg2rekmp3ty" path="res://assets/gradients/radial_purple.tres" id="15_my4oh"]
 [ext_resource type="ArrayMesh" uid="uid://8ep000dpfql3" path="res://assets/meshes/circle_big.obj" id="16_gita3"]
+[ext_resource type="Script" path="res://group_debug.gd" id="17_f310k"]
 
 [sub_resource type="Gradient" id="Gradient_ywhba"]
 interpolation_mode = 2
@@ -46,5 +47,9 @@ texture = SubResource("GradientTexture2D_3v552")
 position = Vector2(360, 1120)
 mesh = ExtResource("16_gita3")
 texture = SubResource("GradientTexture2D_3v552")
+
+[node name="GroupDebug" type="Node2D" parent="."]
+z_index = 1
+script = ExtResource("17_f310k")
 
 [connection signal="level_loaded" from="." to="Pointer" method="_on_main_level_loaded"]

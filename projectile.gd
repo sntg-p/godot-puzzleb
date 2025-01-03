@@ -47,7 +47,7 @@ func _process(delta: float) -> void:
 
 func _to_bubble(row: int, indexInRow: int):
 	if main.has_bubble(row, indexInRow):
-		print('bubble exists, skipping')
+		print('bubble %s-%s exists, skipping' % [row, indexInRow])
 		return
 	
 	main.spawn_bubble(row, indexInRow, type, position)

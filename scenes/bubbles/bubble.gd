@@ -25,8 +25,6 @@ var isEven:
 var is_touching_wall: bool:
 	get:
 		if row == 0: return true
-		if indexInRow == 0: return true
-		if indexInRow == (7 - isOdd): return true
 		return false
 
 
@@ -55,12 +53,6 @@ static func get_neighbor_indexes(row: int, index_in_row: int) -> Array:
 		[row, index_in_row - 1]
 	]
 
-
-#var _neighbor_indexes: Array
-#var neighbor_indexes: Array:
-	#get:
-		#if not _neighbor_indexes:
-			#
 
 static func calculate_position(row: int, indexInRow: int):
 	var isOdd = row % 2
@@ -98,7 +90,13 @@ static func find_or_create_group(neighbor_list: Array[Bubble], type: int) -> Bub
 		var children = group.get_children()
 		for child in children:
 			assert(child is Bubble)
+			group.remove_child(child)
 			last_group.add_child(child)
+		
+		var dependents = group.dependents.values()
+		for dep in dependents:
+			if not is_instance_valid(dep): continue
+			last_group.add_dependent(dep)
 		
 		group.queue_free()
 	
@@ -115,7 +113,7 @@ func add_sibling_bubble(sibling: Bubble):
 
 
 func animate_spawn(origin: Vector2, target: Vector2, tween: Tween):
-	print('animating bubble spawn')
+	position = target
 	tween.tween_property(self, "position", target, .15).from(origin)
 	tween.set_trans(Tween.TRANS_EXPO)
 	pass
@@ -128,5 +126,5 @@ func _ready() -> void:
 func _enter_tree() -> void:
 	var group: BubbleGroup = get_parent()
 	$Label.text = "%s-%s\nt: %s; g: %s" % [
-		row, indexInRow, self.type, group.name.get_slice('_', 1)
+		row, indexInRow, self.type, group.name.get_slice('@', 2)
 	]

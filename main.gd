@@ -25,7 +25,10 @@ func get_bubble(row: int, indexInRow: int) -> Bubble:
 		bubbles[row] = {}
 	
 	var bubblesRow: Dictionary = bubbles[row]
-	return bubblesRow.get(indexInRow)
+	if bubblesRow.has(indexInRow):
+		return bubblesRow.get(indexInRow)
+	
+	return null
 
 
 func new_bubble(row: int, indexInRow: int, type: int, origin: Vector2 = Vector2.ZERO) -> Bubble:
@@ -53,7 +56,7 @@ func new_bubble(row: int, indexInRow: int, type: int, origin: Vector2 = Vector2.
 func _remove_bubble(bubble: Bubble):
 	if has_bubble(bubble.row, bubble.indexInRow):
 		var bubblesRow: Dictionary = bubbles[bubble.row]
-		#print('removing bubble %s-%s' % [bubble.row, bubble.indexInRow])
+		print('removing bubble %s-%s' % [bubble.row, bubble.indexInRow])
 		bubblesRow.erase(bubble.indexInRow)
 		assert(
 			_current_types[bubble.type] > 0,
@@ -73,28 +76,48 @@ func spawn_bubble(row: int, indexInRow: int, type: int, origin = Vector2.ZERO, d
 	var group = Bubble.find_or_create_group(neighbor_list, type)
 	if group:
 		print('spawning bubble at %s-%s' % [row, indexInRow])
-		#group.enable_count_checking = true
 		var bubble = new_bubble(row, indexInRow, type, origin)
+		
+		var is_new_group = false
 		if group.get_parent() != self:
+			is_new_group = true
 			add_child(group)
+		
+		var update_group_deps = func ():
+			if group.is_touching_wall: return
+			for neighbor in neighbor_list:
+				var neighbor_group: BubbleGroup = neighbor.get_parent()
+				if neighbor_group == group: continue
+				
+				neighbor_group.add_dependent(group)
+			
+			print('updated dependencies for group %s' % [group.name])
+			$GroupDebug.queue_redraw()
+			pass
 		
 		if defer_group_add:
 			var add_to_group = func ():
 				group.add_child(bubble)
 				group.check_count()
+				update_group_deps.call()
 			
 			add_to_group.call_deferred()
 		else:
 			group.add_child(bubble)
+			update_group_deps.call()
 
 
 func remove_group(group: BubbleGroup):
+	#var affected_groups: Array[BubbleGroup] = []
+	
 	var children = group.get_children()
 	for child: Bubble in children:
 		_remove_bubble(child)
 	
 	print('destroying group %s' % [group.name])
 	group.destroy()
+	
+	
 
 
 func get_random_bubble_type():
@@ -109,7 +132,7 @@ func get_random_bubble_type():
 	
 	var size = available_types.size()
 	if size > 1:
-		print('available bubble types: %s' % [amount_per_type])
+		#print('available bubble types: %s' % [amount_per_type])
 		return available_types[randi() % size]
 	
 	if size == 1: return available_types[0]
@@ -128,7 +151,8 @@ func _ready() -> void:
 		level_loaded.emit()
 		return
 	
-	var file = "res://levels/01.json"
+	#var file = "res://levels/01.json"
+	var file = "res://levels/error_group_00.json"
 	var levelText = FileAccess.get_file_as_string(file)
 	var levelData: Array = JSON.parse_string(levelText)
 	#print(levelData)
