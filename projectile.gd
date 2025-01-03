@@ -16,7 +16,7 @@ var type = -1
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	print('new projectile')
+	#print('new projectile')
 	var viewport_rect_size = get_viewport_rect().size
 	right = viewport_rect_size.x
 	bottom = viewport_rect_size.y
@@ -95,9 +95,9 @@ func _on_area_entered(area: Area2D) -> void:
 	
 	#print('isOdd: %s; row: %s; indexInRow: %s' % [isOdd, row, indexInRow])
 	
-	print('collision between %s-%s and %s-%s' % [
-		row, indexInRow, collision.row, collision.indexInRow
-	])
+	#print('collision between %s-%s and %s-%s' % [
+		#row, indexInRow, collision.row, collision.indexInRow
+	#])
 	
 	#_to_bubble.call_deferred(row, indexInRow)
 	_to_bubble(row, indexInRow)

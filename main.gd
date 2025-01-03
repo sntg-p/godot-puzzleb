@@ -83,41 +83,56 @@ func spawn_bubble(row: int, indexInRow: int, type: int, origin = Vector2.ZERO, d
 			is_new_group = true
 			add_child(group)
 		
-		var update_group_deps = func ():
-			if group.is_touching_wall: return
-			for neighbor in neighbor_list:
-				var neighbor_group: BubbleGroup = neighbor.get_parent()
-				if neighbor_group == group: continue
-				
-				neighbor_group.add_dependent(group)
-			
-			print('updated dependencies for group %s' % [group.name])
-			$GroupDebug.queue_redraw()
-			pass
-		
 		if defer_group_add:
 			var add_to_group = func ():
 				group.add_child(bubble)
 				group.check_count()
-				update_group_deps.call()
 			
 			add_to_group.call_deferred()
 		else:
 			group.add_child(bubble)
-			update_group_deps.call()
 
-
-func remove_group(group: BubbleGroup):
-	#var affected_groups: Array[BubbleGroup] = []
-	
+func _remove_group(group: BubbleGroup):
 	var children = group.get_children()
 	for child: Bubble in children:
 		_remove_bubble(child)
 	
-	print('destroying group %s' % [group.name])
 	group.destroy()
+
+func remove_group(group: BubbleGroup):
+	_remove_group(group)
 	
+	var floating_groups = _find_floating_groups()
+	for floating_group in floating_groups:
+		_remove_group(floating_group)
+
+func mark_as_hanging(bubble: Bubble, hanging: Set):
+	var neighbors = bubble.neighbor_indexes
+	for neighbor_index in neighbors:
+		var neighbor = get_bubble(neighbor_index[0], neighbor_index[1]) 
+		if neighbor is Bubble:
+			if hanging.has(neighbor): continue
+			hanging.add(neighbor)
+			mark_as_hanging.call(neighbor, hanging)
+
+
+func _find_floating_groups() -> Array:
+	var first_row: Array = bubbles[0].values()
+	var hanging = Set.from_array(first_row)
 	
+	for bubble in first_row:
+		mark_as_hanging(bubble, hanging)
+	
+	var floating = Set.new()
+	var rows: Array = bubbles.values()
+	for row in rows:
+		var row_bubbles: Array = row.values()
+		for bubble in row_bubbles:
+			if not is_instance_valid(bubble): continue
+			if hanging.has(bubble): continue
+			floating.add(bubble.get_parent())
+	
+	return floating.values()
 
 
 func get_random_bubble_type():
@@ -151,8 +166,8 @@ func _ready() -> void:
 		level_loaded.emit()
 		return
 	
-	#var file = "res://levels/01.json"
-	var file = "res://levels/error_group_00.json"
+	var file = "res://levels/01.json"
+	#var file = "res://levels/error_group_00.json"
 	var levelText = FileAccess.get_file_as_string(file)
 	var levelData: Array = JSON.parse_string(levelText)
 	#print(levelData)

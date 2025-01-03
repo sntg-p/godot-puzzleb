@@ -14,7 +14,7 @@ func has(value: Variant) -> bool:
 	return _dictionary.has(valueHash)
 
 
-func values():
+func values() -> Array:
 	return _dictionary.values()
 
 
@@ -33,3 +33,11 @@ func size() -> int:
 		amount += 1
 	
 	return amount
+
+
+static func from_array(array: Array) -> Set:
+	var result = Set.new()
+	for item in array:
+		result.add(item)
+	
+	return result

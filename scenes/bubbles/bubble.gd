@@ -27,6 +27,14 @@ var is_touching_wall: bool:
 		if row == 0: return true
 		return false
 
+var _neighbor_indexes: Array
+var neighbor_indexes: Array:
+	get:
+		if not _neighbor_indexes:
+			_neighbor_indexes = get_neighbor_indexes(row, indexInRow)
+		
+		return _neighbor_indexes
+
 
 static func get_neighbor_indexes(row: int, index_in_row: int) -> Array:
 	var is_even = 0 if row % 2 == 1 else 1
@@ -79,7 +87,7 @@ static func find_or_create_group(neighbor_list: Array[Bubble], type: int) -> Bub
 			matching_groups.add(group)
 			last_group = group
 	
-	print('%s neighbor(s), %s of same type in contact' % [neighbor_list.size(), matches])
+	#print('%s neighbor(s), %s of same type in contact' % [neighbor_list.size(), matches])
 	
 	if not last_group:
 		return BubbleGroup.new(type)
@@ -92,11 +100,6 @@ static func find_or_create_group(neighbor_list: Array[Bubble], type: int) -> Bub
 			assert(child is Bubble)
 			group.remove_child(child)
 			last_group.add_child(child)
-		
-		var dependents = group.dependents.values()
-		for dep in dependents:
-			if not is_instance_valid(dep): continue
-			last_group.add_dependent(dep)
 		
 		group.queue_free()
 	
