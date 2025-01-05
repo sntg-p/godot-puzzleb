@@ -8,6 +8,7 @@ static var verticalOffset = sqrt(pow(diameter, 2) - pow(radius, 2))
 @export var type = -1
 @export var row = -1
 @export var indexInRow = -1
+@onready var trigger: Area2D = $CollapseTrigger
 
 var isOdd:
 	get:
@@ -122,10 +123,12 @@ func animate_spawn(origin: Vector2, target: Vector2, tween: Tween):
 	pass
 
 
-func destroy(index: int):
-	var trigger: Area2D = $CollapseTrigger
+func set_monitorable(value := true):
 	trigger.monitorable = false
-	
+
+
+func destroy(index: int):
+	set_monitorable(false)
 	var target = self.position + Vector2(0, 90 * 12)
 	var tween = create_tween()
 	var tweener = tween.tween_property(self, "position", target, .5)

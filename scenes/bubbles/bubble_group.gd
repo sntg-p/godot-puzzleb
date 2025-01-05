@@ -42,6 +42,7 @@ func destroy():
 	var tween = create_tween()
 	var children = get_children()
 	for child: Bubble in children:
+		child.set_monitorable(false)
 		var tweener = tween.parallel().tween_property(child, "scale", Vector2.ZERO, .15)
 		tweener.set_trans(Tween.TRANS_BACK)
 	
