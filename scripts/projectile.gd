@@ -12,9 +12,8 @@ var type = -1
 		$MeshInstance2D.texture = value
 
 
-@onready var main: Main = get_node('/root/Main')
+@onready var main: BubblesController = get_node('../BubblesController')
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	#print('new projectile')
 	var viewport_rect_size = get_viewport_rect().size
@@ -22,7 +21,6 @@ func _ready() -> void:
 	bottom = viewport_rect_size.y
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	var left_wall_collision = position.x - Bubble.radius <= 0
 	if left_wall_collision:
@@ -36,7 +34,6 @@ func _process(delta: float) -> void:
 	if top_wall_collision:
 		_handle_top_wall_collision()
 		return
-		#linear_velocity.y *= -1
 	
 	var bottom_wall_collision = position.y - Bubble.radius >= bottom
 	if bottom_wall_collision:
@@ -99,7 +96,6 @@ func _on_area_entered(area: Area2D) -> void:
 		#row, indexInRow, collision.row, collision.indexInRow
 	#])
 	
-	#_to_bubble.call_deferred(row, indexInRow)
 	_to_bubble(row, indexInRow)
 
 

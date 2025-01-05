@@ -1,0 +1,7 @@
+[gd_scene load_steps=3 format=3 uid="uid://cyyl8wgifhx76"]
+
+[ext_resource type="PackedScene" uid="uid://dau535t0sny68" path="res://scenes/bubbles/base.tscn" id="1_ehgeq"]
+[ext_resource type="Texture2D" uid="uid://docorikq336li" path="res://assets/gradients/radial_orange.tres" id="2_r5cx6"]
+
+[node name="Bubble" instance=ExtResource("1_ehgeq")]
+texture = ExtResource("2_r5cx6")

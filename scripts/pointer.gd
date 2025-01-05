@@ -4,9 +4,10 @@ extends Node
 @export var bubble_types: Array[Resource]
 
 
-@onready var main: Main = get_node('/root/Main')
+@onready var main: BubblesController = get_node('../BubblesController')
 
 var bubble_type = -1
+var next_bubble_type = -1
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -17,9 +18,11 @@ func _ready() -> void:
 var isPointing = false
 
 func handle_mouse_pointer(event: InputEventMouseButton):
+	if loading: return
+	
 	isPointing = event.pressed
 
-	if (isPointing):
+	if isPointing:
 		$MouseIndicator.process_mode = Node.PROCESS_MODE_INHERIT
 		$MouseIndicator.position = event.position
 		$MouseIndicator.show()
@@ -47,17 +50,29 @@ func _input(event: InputEvent) -> void:
 	
 	if isPointing and event is InputEventMouseMotion:
 		$MouseIndicator.position = event.position
-	
-	pass
 
+
+var loading = false
 
 func update_bubble_types():
-	bubble_type = main.get_random_bubble_type()
-	$NextBubble.texture = bubble_types[bubble_type]
+	loading = true
+	bubble_type = next_bubble_type
+	next_bubble_type = main.get_random_bubble_type()
+	
+	var nextBubble: Node2D = $NextBubble
+	nextBubble.texture = bubble_types[bubble_type]
+	
+	var nextNextBubble = $NextBubble2
+	nextNextBubble.texture = bubble_types[next_bubble_type]
+	var tween = create_tween()
+	var origin = nextNextBubble.position
+	tween.tween_property(nextBubble, "position", nextBubble.position, .15).from(origin)
+	tween.tween_callback(func (): loading = false)
 
 
 func _on_main_level_loaded() -> void:
 	print('_on_main_level_loaded')
 	bubble_type = main.get_random_bubble_type()
+	next_bubble_type = main.get_random_bubble_type()
 	$NextBubble.texture = bubble_types[bubble_type]
-	pass # Replace with function body.
+	$NextBubble2.texture = bubble_types[next_bubble_type]

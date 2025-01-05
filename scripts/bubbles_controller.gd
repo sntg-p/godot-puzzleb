@@ -1,15 +1,13 @@
-class_name Main extends Node2D
+class_name BubblesController extends Node2D
 
 @export var enable_bubble_generation = true
 @export var bubble_scenes: Array[PackedScene]
+@export var level_file = "res://levels/01.json"
 
 signal level_loaded()
 
 
 var bubbles = {}
-#var bubbleGroups: Array[BubbleGroup] = []
-#var bubble_groups: int = 0
-
 var _current_types = {}
 
 
@@ -92,28 +90,38 @@ func spawn_bubble(row: int, indexInRow: int, type: int, origin = Vector2.ZERO, d
 		else:
 			group.add_child(bubble)
 
-func _remove_group(group: BubbleGroup):
+
+func _remove_group(group: BubbleGroup, starting_index := -1) -> int:
 	var children = group.get_children()
 	for child: Bubble in children:
 		_remove_bubble(child)
 	
+	if starting_index != -1:
+		return group.fall(starting_index)
+	
 	group.destroy()
+	return starting_index
+
 
 func remove_group(group: BubbleGroup):
 	_remove_group(group)
 	
 	var floating_groups = _find_floating_groups()
+	if floating_groups.size() == 0: return
+	
+	var starting_index = 0
 	for floating_group in floating_groups:
-		_remove_group(floating_group)
+		starting_index = _remove_group(floating_group, starting_index)
 
-func mark_as_hanging(bubble: Bubble, hanging: Set):
+
+func _mark_as_hanging(bubble: Bubble, hanging: Set):
 	var neighbors = bubble.neighbor_indexes
 	for neighbor_index in neighbors:
 		var neighbor = get_bubble(neighbor_index[0], neighbor_index[1]) 
 		if neighbor is Bubble:
 			if hanging.has(neighbor): continue
 			hanging.add(neighbor)
-			mark_as_hanging.call(neighbor, hanging)
+			_mark_as_hanging(neighbor, hanging)
 
 
 func _find_floating_groups() -> Array:
@@ -121,7 +129,7 @@ func _find_floating_groups() -> Array:
 	var hanging = Set.from_array(first_row)
 	
 	for bubble in first_row:
-		mark_as_hanging(bubble, hanging)
+		_mark_as_hanging(bubble, hanging)
 	
 	var floating = Set.new()
 	var rows: Array = bubbles.values()
@@ -156,19 +164,18 @@ func get_random_bubble_type():
 		return -1
 
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	if not enable_bubble_generation:
 		print('level loading disabled, setting all bubble types as current')
-		for i in range(6):
+		var bubble_types = bubble_scenes.size()
+		for i in bubble_types:
 			_current_types[i] = 9223372036854775807 / 2
 		
 		level_loaded.emit()
 		return
 	
-	var file = "res://levels/01.json"
 	#var file = "res://levels/error_group_00.json"
-	var levelText = FileAccess.get_file_as_string(file)
+	var levelText = FileAccess.get_file_as_string(level_file)
 	var levelData: Array = JSON.parse_string(levelText)
 	#print(levelData)
 	

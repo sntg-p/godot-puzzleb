@@ -122,6 +122,20 @@ func animate_spawn(origin: Vector2, target: Vector2, tween: Tween):
 	pass
 
 
+func destroy(index: int):
+	var trigger: Area2D = $CollapseTrigger
+	trigger.monitorable = false
+	
+	var target = self.position + Vector2(0, 90 * 12)
+	var tween = create_tween()
+	var tweener = tween.tween_property(self, "position", target, .5)
+	tweener.set_delay(index * .05)
+	#tweener.set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_BACK)
+	tweener.set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUART)
+	tween.tween_callback(self.queue_free)
+	return index + 1
+
+
 func _ready() -> void:
 	name = "Bubble_%s_%s" % [row, indexInRow]
 
