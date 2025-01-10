@@ -1,0 +1,49 @@
+[gd_scene load_steps=7 format=3 uid="uid://cj8gj7kavlod3"]
+
+[ext_resource type="Script" path="res://scenes/particles/bubble_break.gd" id="1_st87o"]
+
+[sub_resource type="Curve" id="Curve_u5gkg"]
+_data = [Vector2(0.741713, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_lyg3e"]
+curve = SubResource("Curve_u5gkg")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_6eoku"]
+lifetime_randomness = 0.7
+particle_flag_disable_z = true
+emission_shape = 2
+emission_sphere_radius = 45.0
+angle_min = 45.0
+angle_max = 45.0
+radial_velocity_min = -2.23517e-05
+radial_velocity_max = 400.0
+gravity = Vector3(0, 980, 0)
+scale_min = 0.5
+scale_max = 2.5
+alpha_curve = SubResource("CurveTexture_lyg3e")
+
+[sub_resource type="Gradient" id="Gradient_dpcot"]
+offsets = PackedFloat32Array(0.430518, 0.956403, 1)
+colors = PackedColorArray(0.25, 0.25, 0.25, 1, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_rnxs3"]
+gradient = SubResource("Gradient_dpcot")
+width = 16
+height = 16
+fill = 2
+fill_from = Vector2(0.5, 0.5)
+metadata/_snap_enabled = true
+
+[node name="GPUParticles2D" type="GPUParticles2D"]
+emitting = false
+amount = 24
+process_material = SubResource("ParticleProcessMaterial_6eoku")
+texture = SubResource("GradientTexture2D_rnxs3")
+lifetime = 0.7
+one_shot = true
+explosiveness = 0.8
+fixed_fps = 60
+script = ExtResource("1_st87o")
+
+[connection signal="finished" from="." to="." method="_on_finished"]

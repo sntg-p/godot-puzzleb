@@ -10,6 +10,7 @@ static var verticalOffset = sqrt(pow(diameter, 2) - pow(radius, 2))
 @export var indexInRow = -1
 @onready var trigger: Area2D = $CollapseTrigger
 
+
 var isOdd:
 	get:
 		assert(row > -1)
@@ -27,6 +28,7 @@ var is_touching_wall: bool:
 	get:
 		if row == 0: return true
 		return false
+
 
 var _neighbor_indexes: Array
 var neighbor_indexes: Array:
@@ -78,15 +80,16 @@ static func find_or_create_group(neighbor_list: Array[Bubble], type: int) -> Bub
 	var last_group: BubbleGroup
 
 	for bubble in neighbor_list:
-		if bubble.type == type:
-			print('%s-%s is of same type' % [bubble.row, bubble.indexInRow])
-			var group = bubble.get_parent()
-			if matching_groups.has(group): continue
-			
-			assert(group != null, 'bubble %s-%s parent is null' % [bubble.row, bubble.indexInRow])
-			matches += group.get_child_count()
-			matching_groups.add(group)
-			last_group = group
+		if bubble.type != type: continue
+		
+		print('%s-%s is of same type' % [bubble.row, bubble.indexInRow])
+		var group = bubble.get_parent()
+		if matching_groups.has(group): continue
+		
+		assert(group != null, 'bubble %s-%s parent is null' % [bubble.row, bubble.indexInRow])
+		matches += group.get_child_count()
+		matching_groups.add(group)
+		last_group = group
 	
 	#print('%s neighbor(s), %s of same type in contact' % [neighbor_list.size(), matches])
 	
@@ -107,20 +110,10 @@ static func find_or_create_group(neighbor_list: Array[Bubble], type: int) -> Bub
 	return last_group
 
 
-func type_matches(projectile: ProjectileBubble):
-	return projectile.type == self.type
-
-
-func add_sibling_bubble(sibling: Bubble):
-	var group: BubbleGroup = get_parent()
-	group.add_child(sibling)
-
-
 func animate_spawn(origin: Vector2, target: Vector2, tween: Tween):
 	position = target
 	tween.tween_property(self, "position", target, .15).from(origin)
 	tween.set_trans(Tween.TRANS_EXPO)
-	pass
 
 
 func set_monitorable(value := true):

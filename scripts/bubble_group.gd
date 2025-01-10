@@ -1,5 +1,6 @@
 class_name BubbleGroup extends Node2D
 
+static var bubble_break: PackedScene = preload("res://scenes/particles/bubble_break.tscn")
 
 var type = -1
 
@@ -45,6 +46,10 @@ func destroy():
 		child.set_monitorable(false)
 		var tweener = tween.parallel().tween_property(child, "scale", Vector2.ZERO, .15)
 		tweener.set_trans(Tween.TRANS_BACK)
+		var particles: BubbleBreakParticles = bubble_break.instantiate()
+		particles.type = self.type
+		particles.position = child.position
+		add_sibling(particles)
 	
 	tween.tween_callback(self.queue_free)
 

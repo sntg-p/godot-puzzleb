@@ -1,14 +1,16 @@
 class_name BubblesController extends Node2D
 
+
 @export var enable_bubble_generation = true
 @export var bubble_scenes: Array[PackedScene]
 @export var level_file = "res://levels/01.json"
 
-signal level_loaded()
-
 
 var bubbles = {}
 var _current_types = {}
+
+
+signal level_loaded()
 
 
 func has_bubble(row: int, indexInRow: int) -> bool:
