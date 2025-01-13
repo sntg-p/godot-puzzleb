@@ -1,6 +1,24 @@
-[gd_scene load_steps=7 format=3 uid="uid://cj8gj7kavlod3"]
+[gd_scene load_steps=11 format=3 uid="uid://cj8gj7kavlod3"]
 
+[ext_resource type="Shader" path="res://assets/shaders/color_texture.gdshader" id="1_n0jvh"]
 [ext_resource type="Script" path="res://scenes/particles/bubble_break.gd" id="1_st87o"]
+
+[sub_resource type="Gradient" id="Gradient_rgls0"]
+offsets = PackedFloat32Array(0.437309, 0.920489, 1)
+colors = PackedColorArray(0.25, 0.25, 0.25, 1, 0.85, 0.85, 0.85, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_sjsj6"]
+gradient = SubResource("Gradient_rgls0")
+width = 16
+height = 16
+fill = 2
+fill_from = Vector2(0.5, 0.5)
+metadata/_snap_enabled = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ib1pe"]
+shader = ExtResource("1_n0jvh")
+shader_parameter/color = Color(1, 1, 1, 1)
+shader_parameter/tex1 = SubResource("GradientTexture2D_sjsj6")
 
 [sub_resource type="Curve" id="Curve_u5gkg"]
 _data = [Vector2(0.741713, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -23,23 +41,20 @@ scale_min = 0.5
 scale_max = 2.5
 alpha_curve = SubResource("CurveTexture_lyg3e")
 
-[sub_resource type="Gradient" id="Gradient_dpcot"]
-offsets = PackedFloat32Array(0.430518, 0.956403, 1)
-colors = PackedColorArray(0.25, 0.25, 0.25, 1, 1, 1, 1, 1, 1, 1, 1, 0)
+[sub_resource type="Gradient" id="Gradient_utncb"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1)
 
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_rnxs3"]
-gradient = SubResource("Gradient_dpcot")
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_1ullf"]
+gradient = SubResource("Gradient_utncb")
 width = 16
 height = 16
-fill = 2
-fill_from = Vector2(0.5, 0.5)
-metadata/_snap_enabled = true
 
 [node name="GPUParticles2D" type="GPUParticles2D"]
+material = SubResource("ShaderMaterial_ib1pe")
 emitting = false
 amount = 24
 process_material = SubResource("ParticleProcessMaterial_6eoku")
-texture = SubResource("GradientTexture2D_rnxs3")
+texture = SubResource("GradientTexture2D_1ullf")
 lifetime = 0.7
 one_shot = true
 explosiveness = 0.8
